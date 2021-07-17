@@ -75,52 +75,65 @@ class axie extends Model
     //converte data do proximo claim
     public function prox_date($data)
     {
+        if(sizeof($data) >= 1){
         $intervalo = 1209600;
         $ndata = $data + $intervalo;
 
+
+        }
+        if(sizeof($data) == 0){
+
+            $ndata = 0 ;
+        }
         return $ndata;
     }
 
     public function slp_jogador($data)
     {
-       foreach($data as $item)
-       {
-            $parte_jogador = axie::where('id', $item['time_id'])->value('slp_aluno');
-            $slp_jogador = $item['qtdSlp'] * $parte_jogador;
+       if(sizeof($data) >= 1){
+            foreach($data as $item)
+            {
+                    $parte_jogador = axie::where('id', $item['time_id'])->value('slp_aluno');
+                    $slp_jogador = $item['qtdSlp'] * $parte_jogador;
 
-            $array_slp[] = [
-               'slp_jogador'=> $slp_jogador
-            ];
+                    $array_slp[] = [
+                    'slp_jogador'=> $slp_jogador
+                    ];
 
+            }
+            $total = array_sum( array_column($array_slp, 'slp_jogador'));
        }
-       $total = array_sum( array_column($array_slp, 'slp_jogador'));
+       if(sizeof($data) == 0){
+
+        $total = 0 ;
+        }
 
        return $total;
     }
 
     public function api_coingecko($data)
     {
+        if(sizeof($data) >= 1){
+            $link = 'https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=0xcc8fa225d80b9c7d42f96e9570156c65d6caaa25&vs_currencies=';
+            $coin = file_get_contents($link.$data);
+            $valor = json_decode($coin, true);
 
-        $link = 'https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=0xcc8fa225d80b9c7d42f96e9570156c65d6caaa25&vs_currencies=';
-        $coin = file_get_contents($link.$data);
-        $valor = json_decode($coin, true);
-
-        if($data == 'brl')
-        {
-            $v_coin = $valor['0xcc8fa225d80b9c7d42f96e9570156c65d6caaa25']['brl'];
-            return $v_coin;
+            if($data == 'brl')
+            {
+                $v_coin = $valor['0xcc8fa225d80b9c7d42f96e9570156c65d6caaa25']['brl'];
+                return $v_coin;
+            }
+            if($data == 'usd')
+            {
+                $v_coin = $valor['0xcc8fa225d80b9c7d42f96e9570156c65d6caaa25']['usd'];
+                return $v_coin;
+            }
+            if($data == 'eur')
+            {
+                $v_coin = $valor['0xcc8fa225d80b9c7d42f96e9570156c65d6caaa25']['eur'];
+                return $v_coin;
+            }
         }
-        if($data == 'usd')
-        {
-            $v_coin = $valor['0xcc8fa225d80b9c7d42f96e9570156c65d6caaa25']['usd'];
-            return $v_coin;
-        }
-        if($data == 'eur')
-        {
-            $v_coin = $valor['0xcc8fa225d80b9c7d42f96e9570156c65d6caaa25']['eur'];
-            return $v_coin;
-        }
-
 
 
     }
